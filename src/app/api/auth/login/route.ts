@@ -8,6 +8,7 @@ export async function POST(req: Request) {
   const body = (await req.json()) as LoginBodyType;
   const cookieStore = cookies();
   try {
+    // response lấy về sau khi call api login của BE server
     const { payload } = await authApiRequest.loginFromNextServerToBeServer(
       body
     );

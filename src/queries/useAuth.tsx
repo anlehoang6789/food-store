@@ -6,3 +6,9 @@ export const useMutationLogin = () => {
     mutationFn: authApiRequest.loginFromNextClientToNextServer,
   });
 };
+
+export const useMutationLogout = () => {
+  return useMutation({
+    mutationFn: authApiRequest.logoutFromNextClientToNextServer,
+  });
+};
