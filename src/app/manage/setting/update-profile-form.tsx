@@ -13,14 +13,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAccountProfile } from "@/queries/useAccount";
+import {
+  useMeProfileQuery,
+  useUpdateMeProfileMutation,
+} from "@/queries/useAccount";
+import { toast } from "@/hooks/use-toast";
+import { handleErrorApi } from "@/lib/utils";
+import { useUploadMediaMutation } from "@/queries/useMedia";
 
 export default function UpdateProfileForm() {
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
       name: "",
-      avatar: "",
+      avatar: undefined,
     },
   });
 
@@ -37,22 +43,55 @@ export default function UpdateProfileForm() {
   }, [avatar, file]);
 
   //lay data fetch tu api getMe de hien thi thay the cho cac gia tri mac dinh
-  const { data } = useAccountProfile();
+  const { data, refetch } = useMeProfileQuery();
   useEffect(() => {
     if (data) {
       const { name, avatar } = data.payload.data;
       form.reset({
         name,
-        avatar: avatar ?? "",
+        avatar: avatar ?? undefined,
       });
     }
   }, [form, data]);
+
+  const reset = () => {
+    form.reset();
+    setFile(null);
+  };
+
+  const updateAvatar = useUploadMediaMutation();
+  const updateProfile = useUpdateMeProfileMutation();
+  const onSubmit = async (data: UpdateMeBodyType) => {
+    if (updateProfile.isPending) return;
+    try {
+      //check xem có upload file cho avatar không
+      let body = data;
+      if (file) {
+        const formData = new FormData();
+        formData.append("avatar", file);
+        const uploadAvatarResult = await updateAvatar.mutateAsync(formData);
+        const imageUrl = uploadAvatarResult.payload.data;
+        body = { ...data, avatar: imageUrl };
+      }
+      const result = await updateProfile.mutateAsync(body);
+      toast({
+        description: result.payload.message,
+      });
+      refetch();
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError });
+    }
+  };
 
   return (
     <Form {...form}>
       <form
         noValidate
         className="grid auto-rows-max items-start gap-4 md:gap-8"
+        onReset={reset}
+        onSubmit={form.handleSubmit(onSubmit, (error) => {
+          console.warn(error);
+        })}
       >
         <Card x-chunk="dashboard-07-chunk-0">
           <CardHeader>
@@ -81,6 +120,9 @@ export default function UpdateProfileForm() {
                           const file = e.target.files?.[0];
                           if (file) {
                             setFile(file);
+                            field.onChange(
+                              "http://localhost:3000/" + field.name
+                            );
                           }
                         }}
                       />

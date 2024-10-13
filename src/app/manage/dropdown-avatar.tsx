@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useMutationLogout } from "@/queries/useAuth";
 import { handleErrorApi } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useAccountProfile } from "@/queries/useAccount";
+import { useMeProfileQuery } from "@/queries/useAccount";
 
 // const account = {
 //   name: "Nguyễn Văn A",
@@ -34,7 +34,7 @@ export default function DropdownAvatar() {
     }
   };
 
-  const { data } = useAccountProfile();
+  const { data } = useMeProfileQuery();
   const account = data?.payload.data;
   return (
     <DropdownMenu>
