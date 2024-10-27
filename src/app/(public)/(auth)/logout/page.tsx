@@ -1,5 +1,8 @@
 "use client";
-import { getRefreshTokenFromLocalStorage } from "@/lib/utils";
+import {
+  getAccessTokenFromLocalStorage,
+  getRefreshTokenFromLocalStorage,
+} from "@/lib/utils";
 import { useMutationLogout } from "@/queries/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useRef } from "react";
@@ -13,13 +16,18 @@ export default function LogoutPage() {
 
   const searchParams = useSearchParams();
   const refreshTokenFromUrl = searchParams.get("refreshToken");
+  const accessTokenFromUrl = searchParams.get("accessToken");
 
   useEffect(() => {
     if (
       // Phòng case api logout gọi 2 lần
       ref.current ||
       //   Phòng trường hợp người dùng thay đổi refreshToken từ url
-      refreshTokenFromUrl !== getRefreshTokenFromLocalStorage()
+      (refreshTokenFromUrl &&
+        refreshTokenFromUrl !== getRefreshTokenFromLocalStorage()) ||
+      //   Phòng trường hợp người dùng thay đổi accessToken từ url
+      (accessTokenFromUrl &&
+        accessTokenFromUrl !== getAccessTokenFromLocalStorage())
     ) {
       return;
     }
@@ -30,7 +38,7 @@ export default function LogoutPage() {
       }, 1000);
       router.push("/login");
     });
-  }, [mutateAsync, router, refreshTokenFromUrl]);
+  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl]);
 
   return <div>Logout ....</div>;
 }

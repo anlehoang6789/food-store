@@ -142,6 +142,7 @@ const request = async <Response>(
           }
         }
       } else {
+        // Đây là trường hợp khi mà accessToken vẫn còn hạn và chúng ta gọi api ở Next Server đến BE server
         const accessToken = (options?.headers as any)?.Authorization.split(
           "Bearer "
         )[1];
