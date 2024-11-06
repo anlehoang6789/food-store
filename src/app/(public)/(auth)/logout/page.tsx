@@ -1,4 +1,5 @@
 "use client";
+import { useAppContext } from "@/components/app-provider";
 import {
   getAccessTokenFromLocalStorage,
   getRefreshTokenFromLocalStorage,
@@ -10,6 +11,7 @@ import React, { useEffect, useRef } from "react";
 export default function LogoutPage() {
   const { mutateAsync } = useMutationLogout();
   const router = useRouter();
+  const { setIsAuth } = useAppContext();
 
   // Tạo 1 biến sử dụng useRef() để có thể can thiệp cho trường hợp api logout gọi 2 lần.
   const ref = useRef<any>(null);
@@ -34,6 +36,7 @@ export default function LogoutPage() {
         setTimeout(() => {
           ref.current = null;
         }, 1000);
+        setIsAuth(false);
         router.push("/login");
       });
     } else {
