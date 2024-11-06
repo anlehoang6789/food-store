@@ -16,11 +16,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutationLogin } from "@/queries/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { handleErrorApi } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { useAppContext } from "@/components/app-provider";
 
 export default function LoginForm() {
   // gọi api login được cấu hình trong tanstack
   const loginMutation = useMutationLogin();
+  const searchParams = useSearchParams();
+  const clearToken = searchParams.get("clearToken");
+  const { setIsAuth } = useAppContext();
   const router = useRouter();
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -29,6 +34,13 @@ export default function LoginForm() {
       password: "",
     },
   });
+
+  //Ở đây check coi bên middleware cái trường hợp mà không có refreshToken có truyền cái clearToken trên url không nếu có thì xóa token khỏi localStorage
+  useEffect(() => {
+    if (clearToken) {
+      setIsAuth(false);
+    }
+  }, [clearToken, setIsAuth]);
 
   const onSubmit = async (data: LoginBodyType) => {
     // Nếu đang loading thì không cho nhấn nữa

@@ -25,6 +25,9 @@ export default function RefreshTokenPage() {
           router.push(redirectPathname || "/");
         },
       });
+    } else {
+      // nếu mà nó check cái refreshToken từ url không khớp với cái được lưu thì nó chuyển về trang Home
+      router.push("/");
     }
   }, [router, refreshTokenFromUrl, redirectPathname]);
 

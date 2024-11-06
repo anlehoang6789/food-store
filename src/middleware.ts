@@ -12,7 +12,9 @@ export function middleware(request: NextRequest) {
 
   // Chưa đăng nhập thì kh cho vào private path -> chưa đăng nhập thì kh có refreshToken
   if (privatePaths.some((path) => pathname.startsWith(path)) && !refreshToken) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    const url = new URL("/login", request.url);
+    url.searchParams.set("clearToken", "true");
+    return NextResponse.redirect(url);
   }
 
   // Đã đăng nhập thì không cho vào trang login

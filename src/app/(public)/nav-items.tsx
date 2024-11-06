@@ -1,8 +1,7 @@
 "use client";
 
-import { getAccessTokenFromLocalStorage } from "@/lib/utils";
+import { useAppContext } from "@/components/app-provider";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 const menuItems = [
   {
@@ -36,11 +35,7 @@ const menuItems = [
 //Để fix thì chúng ta có thể dùng useEffect để render lại sau khi client đã lấy đc dữ liệu từ server
 
 export default function NavItems({ className }: { className?: string }) {
-  //dùng state để lưu trạng thái đăng nhập và bắt đầu là false cho giống server khi nó chưa biết trạng thái đăng nhập
-  const [isAuth, setIsAuth] = useState(false);
-  useEffect(() => {
-    setIsAuth(Boolean(getAccessTokenFromLocalStorage()));
-  }, []);
+  const { isAuth } = useAppContext();
   return menuItems.map((item) => {
     // Nếu item không cần auth và đã đăng nhập hoặc item cần auth và chưa đăng nhập thì không hiển thị
     if (

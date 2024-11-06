@@ -21,23 +21,24 @@ export default function LogoutPage() {
   useEffect(() => {
     if (
       // Phòng case api logout gọi 2 lần
-      ref.current ||
+      !ref.current &&
       //   Phòng trường hợp người dùng thay đổi refreshToken từ url
-      (refreshTokenFromUrl &&
-        refreshTokenFromUrl !== getRefreshTokenFromLocalStorage()) ||
-      //   Phòng trường hợp người dùng thay đổi accessToken từ url
-      (accessTokenFromUrl &&
-        accessTokenFromUrl !== getAccessTokenFromLocalStorage())
+      ((refreshTokenFromUrl &&
+        refreshTokenFromUrl === getRefreshTokenFromLocalStorage()) ||
+        //   Phòng trường hợp người dùng thay đổi accessToken từ url
+        (accessTokenFromUrl &&
+          accessTokenFromUrl === getAccessTokenFromLocalStorage()))
     ) {
-      return;
+      ref.current = mutateAsync;
+      mutateAsync().then((res) => {
+        setTimeout(() => {
+          ref.current = null;
+        }, 1000);
+        router.push("/login");
+      });
+    } else {
+      router.push("/");
     }
-    ref.current = mutateAsync;
-    mutateAsync().then((res) => {
-      setTimeout(() => {
-        ref.current = null;
-      }, 1000);
-      router.push("/login");
-    });
   }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl]);
 
   return <div>Logout ....</div>;
