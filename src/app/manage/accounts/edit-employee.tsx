@@ -102,11 +102,16 @@ export default function EditEmployee({
       toast({
         description: result.payload.message,
       });
-      setId(undefined);
+      reset();
       onSubmitSuccess && onSubmitSuccess();
     } catch (error) {
       handleErrorApi({ error, setError: form.setError });
     }
+  };
+
+  const reset = () => {
+    setId(undefined);
+    setFile(null);
   };
 
   return (
@@ -114,7 +119,7 @@ export default function EditEmployee({
       open={Boolean(id)}
       onOpenChange={(value) => {
         if (!value) {
-          setId(undefined);
+          reset();
         }
       }}
     >
