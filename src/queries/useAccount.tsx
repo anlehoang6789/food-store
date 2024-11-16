@@ -51,10 +51,18 @@ export const useAddEmployeeMutation = () => {
   });
 };
 
-export const useEmployeeDetailsQuery = (id: number) => {
+export const useEmployeeDetailsQuery = ({
+  id,
+  enabled,
+}: {
+  id: number;
+  enabled: boolean;
+}) => {
   return useQuery({
     queryKey: ["accounts", id],
     queryFn: () => accountApiRequest.employeeDetails(id),
+    // enabled: false => không fetch dữ liệu khi component render
+    enabled,
   });
 };
 
@@ -69,6 +77,8 @@ export const useUpdateEmployeeMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["accounts"],
+        //exact: true => invalidate cache của 1 employee cụ thể
+        exact: true,
       });
     },
   });
