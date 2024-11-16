@@ -1,12 +1,16 @@
 import http from "@/lib/http";
 import {
+  AccountListResType,
   AccountResType,
   ChangePasswordBodyType,
   ChangePasswordV2BodyType,
   ChangePasswordV2ResType,
+  CreateEmployeeAccountBodyType,
+  UpdateEmployeeAccountBodyType,
   UpdateMeBodyType,
 } from "@/schemaValidations/account.schema";
 
+const prefix = "/accounts";
 const accountApiRequest = {
   meProfile: () => http.get<AccountResType>("/accounts/me"),
   updateMeProfile: (data: UpdateMeBodyType) =>
@@ -17,7 +21,7 @@ const accountApiRequest = {
     accessToken: string,
     body: ChangePasswordV2BodyType
   ) =>
-    http.put<ChangePasswordV2ResType>("accounts/change-password-v2", body, {
+    http.put<ChangePasswordV2ResType>("/accounts/change-password-v2", body, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -32,6 +36,16 @@ const accountApiRequest = {
         baseUrl: "",
       }
     ),
+
+  listEmployees: () => http.get<AccountListResType>(prefix),
+  addEmployee: (body: CreateEmployeeAccountBodyType) =>
+    http.post<AccountResType>(prefix, body),
+  employeeDetails: (id: number) =>
+    http.get<AccountResType>(`${prefix}/detail/${id}`),
+  updateEmployee: (id: number, body: UpdateEmployeeAccountBodyType) =>
+    http.put<AccountResType>(`${prefix}/detail/${id}`, body),
+  deleteEmployee: (id: number) =>
+    http.delete<AccountResType>(`${prefix}/detail/${id}`),
 };
 
 export default accountApiRequest;
